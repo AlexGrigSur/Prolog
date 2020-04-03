@@ -4,12 +4,14 @@ in_list([_|T],El):-in_list(T,El).
 
 pr_ein:-Event=[_,_,_,_],
     in_list(Event,[funeral,italy,_,_]),
-    in_list(Event,[wedding,france,_,15]),
+    in_list(Event,[wedding,france,_,_]),
+    in_list(Event,[_,france,_,15]),
     in_list(Event,[rest,china,_,_]),
     in_list(Event,[conference,_,programmer,_]),
     in_list(Event,[_,usa,_,1]),
     in_list(Event,[_,_,official,45]),
     in_list(Event,[_,_,banker,6]),
+    in_list(Event,[_,_,blogger,_]),
     not(in_list(Event,[_,china,blogger,_])),
     not(in_list(Event,[_,china,official,_])),
 
