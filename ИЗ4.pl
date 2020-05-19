@@ -22,27 +22,23 @@ iz3_predicate:-Childrens=[_,_,_,_,_],
     in_list(Childrens,[_,Slavyansk]),
     in_list(Childrens,[_,Kramatorsk]),
     
-    (    % начало обработки высказываний
-        ( % №1
-            not(in_list(Childrens,[Alik,Ymani])),
-            in_list(Childrens,[Borya,Kramatorsk])
-        );
-        ( % №2
-          (
-            in_list(Childrens,[Borya,Harkov]);
-            in_list(Childrens,[Vitya,Harkov])
-          )
-        );
-        ( % №3
-            not(in_list(Childrens,[Vitya,Slavyansk])),
-            in_list(Childrens,[Lena,Harkov])
-        );
-        ( % №4
-            (
-              in_list(Childrens,[Dasha,Ymani]);
-              in_list(Childrens,[Lena,Kramatorsk])
-            )
-        )
+    (
+      (   %1
+         in_list(Childrens,[Alik,Ymani]);
+         in_list(Childrens,[Borya,Kramatorsk])
+       ),
+       (  %2
+         in_list(Childrens,[Borya,Harkov]);
+         in_list(Childrens,[Vitya,Harkov])
+       ),
+       (  %3
+         in_list(Childrens,[Vitya,Slavyansk]);
+         in_list(Childrens,[Lena,Harkov])
+       ),
+       (  %4
+         in_list(Childrens,[Dasha,Ymani]);
+         in_list(Childrens,[Lena,Kramatorsk])
+       )
     ),
 
     in_list(Childrens,[F1,Harkov]),
