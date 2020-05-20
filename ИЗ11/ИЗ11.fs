@@ -122,6 +122,28 @@ form.Controls.Add(label6)
 form.Controls.Add(richTextBox1)
 form.Controls.Add(label7)
 
+
+let Click(e:EventArgs) =
+    try
+        let a = Convert.ToDouble(textBox1.Text)
+        let b = Convert.ToDouble(textBox2.Text)
+        let c = Convert.ToDouble(textBox3.Text)
+        let Det = b * b - 4.0 * a * c
+        if(Det < 0.0) 
+            then richTextBox1.Text<- "Действительных корней нет"
+        else
+            if(Det = 0.0)
+                then richTextBox1.Text<- Convert.ToString(-b/(2.0*a))
+            else
+                richTextBox1.Text <- "[ " + Convert.ToString((-b+sqrt(Det))/(2.0*a)) + " ; " + Convert.ToString((-b-sqrt(Det))/(2.0*a)) + " ]";
+        ()
+    with  
+        | :? Exception -> MessageBox.Show("Incorrect input","Error") |> ignore
+
+Calculate.Click.Add(Click)
+
+[<STAThread>]
+
 [<EntryPoint>]
 let main argv =
     do Application.Run(form)
