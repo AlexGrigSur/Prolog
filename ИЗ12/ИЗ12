@@ -105,10 +105,13 @@ let list2Calc (textBoxCopy:list<string>) (list1:list<int>) =
         match textBoxCopy with
         |[] -> count
         |_ -> 
-                if (Convert.ToInt32(textBoxCopy.Head) = elem) then
-                   findCount textBoxCopy.Tail elem (count+1)
-                else
-                    findCount textBoxCopy.Tail elem count
+                try
+                    if (Convert.ToInt32(textBoxCopy.Head) = elem) then
+                       findCount textBoxCopy.Tail elem (count+1)
+                    else
+                        findCount textBoxCopy.Tail elem count
+                with
+                    | :? Exception -> findCount textBoxCopy.Tail elem count
 
     let rec list2Output (list1:list<int>) = 
         match list1 with
