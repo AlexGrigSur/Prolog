@@ -1,0 +1,172 @@
+open System
+open System.IO
+open System.Drawing
+open System.Windows.Forms
+
+let form = new Form()
+let label1 = new System.Windows.Forms.Label();
+let textBox1 = new System.Windows.Forms.TextBox();
+let button1 = new System.Windows.Forms.Button();
+let label2 = new System.Windows.Forms.Label();
+let textBox2 = new System.Windows.Forms.TextBox();
+let label3 = new System.Windows.Forms.Label();
+let textBox3 = new System.Windows.Forms.TextBox();
+// 
+// textBox1
+// 
+textBox1.Anchor <- (System.Windows.Forms.AnchorStyles.Top ||| System.Windows.Forms.AnchorStyles.Left ||| System.Windows.Forms.AnchorStyles.Right);
+textBox1.Location <- new System.Drawing.Point(40, 60);
+textBox1.Name <- "textBox1";
+textBox1.Size <- new System.Drawing.Size(399, 22);
+textBox1.TabIndex <- 0;
+// 
+// textBox2
+// 
+textBox2.Anchor <- (System.Windows.Forms.AnchorStyles.Top ||| System.Windows.Forms.AnchorStyles.Left ||| System.Windows.Forms.AnchorStyles.Right);
+textBox2.Location <- new System.Drawing.Point(40, 174);
+textBox2.Name <- "textBox2";
+textBox2.Size <- new System.Drawing.Size(399, 22);
+textBox2.TabIndex <- 2;
+// 
+// textBox3
+// 
+textBox3.Anchor <- (System.Windows.Forms.AnchorStyles.Top ||| System.Windows.Forms.AnchorStyles.Left ||| System.Windows.Forms.AnchorStyles.Right);
+textBox3.Location <- new System.Drawing.Point(40, 218);
+textBox3.Name <- "textBox3";
+textBox3.Size <- new System.Drawing.Size(399, 22);
+textBox3.TabIndex <- 3;
+// 
+// button1
+// 
+button1.Anchor <- (System.Windows.Forms.AnchorStyles.Top ||| System.Windows.Forms.AnchorStyles.Left ||| System.Windows.Forms.AnchorStyles.Right);
+button1.Location <- new System.Drawing.Point(40, 88);
+button1.Name <- "button1";
+button1.Size <- new System.Drawing.Size(399, 49);
+button1.TabIndex <- 1;
+button1.Text <- "Рассчитать";
+button1.UseVisualStyleBackColor <- true;
+// 
+// label1
+// 
+label1.AutoSize <- true;
+label1.Location <- new System.Drawing.Point(37, 41);
+label1.Name <- "label1";
+label1.Size <- new System.Drawing.Size(281, 16);
+label1.TabIndex <- 4;
+label1.Text <- "Введите начальную последовательность";
+// 
+// label2
+// 
+label2.AutoSize <- true;
+label2.Location <- new System.Drawing.Point(37, 155);
+label2.Name <- "label2";
+label2.Size <- new System.Drawing.Size(234, 16);
+label2.TabIndex <- 5;
+label2.Text <- "Список №1(уникальные элементы)";
+// 
+// label3
+// 
+label3.AutoSize <- true;
+label3.Location <- new System.Drawing.Point(37, 199);
+label3.Name <- "label3";
+label3.Size <- new System.Drawing.Size(401, 16);
+label3.TabIndex <- 6;
+label3.Text <- "Список №2(количество повторений уникальных элементов)";
+// 
+// Form1
+// 
+form.AutoScaleDimensions <- new System.Drawing.SizeF(8.0F, 16.0F);
+form.AutoScaleMode <- System.Windows.Forms.AutoScaleMode.Font;
+form.ClientSize <- new System.Drawing.Size(467, 281);
+form.FormBorderStyle <- System.Windows.Forms.FormBorderStyle.Sizable;
+form.Margin <- new System.Windows.Forms.Padding(4, 4, 4, 4);
+form.Name <- "Form1";
+form.Text <- "ИЗ №12(#2)";
+
+form.Controls.Add(label3);
+form.Controls.Add(label2);
+form.Controls.Add(label1);
+form.Controls.Add(button1);
+form.Controls.Add(textBox3);
+form.Controls.Add(textBox2);
+form.Controls.Add(textBox1);
+
+
+//ИЗ12(#2). Для введенного списка построить два списка L1 и L2, где элементы L1 это
+//неповторяющиеся элементы исходного списка, а элемент списка L2 с
+//номером i показывает, сколько раз элемент списка L1 с таким номером
+//повторяется в исходном. 
+
+// 23/05/2020 4:37 Я задолбался фиксить эти баги с тупыми приведениями тупых типов тупых списков, так что сделал везде явное указание
+// может выглядит так себе, но работает
+
+let list2Calc (textBoxCopy:list<string>) (list1:list<int>) =
+    let rec findCount (textBoxCopy:list<string>) (elem:int) count =
+        match textBoxCopy with
+        |[] -> count
+        |_ -> 
+                if (Convert.ToInt32(textBoxCopy.Head) = elem) then
+                   findCount textBoxCopy.Tail elem (count+1)
+                else
+                    findCount textBoxCopy.Tail elem count
+
+    let rec list2Output (list1:list<int>) = 
+        match list1 with
+        |[] -> ()
+        |_ -> textBox3.Text <- textBox3.Text + Convert.ToString(findCount textBoxCopy list1.Head 0) + " "
+              list2Output list1.Tail
+
+    list2Output list1
+    ()
+
+let list1Calc (textBoxCopy:list<string>)=
+    let rec findRepeats (list:list<int>) (elem:int) =
+        match list with
+        | [] -> true
+        | _ -> 
+                if(list.Head = elem) then false
+                else findRepeats list.Tail elem
+
+    let rec uniqueElems (list1:list<int>) (textBoxCopy:list<string>) =
+        match textBoxCopy with
+        | [] -> list1
+        | _ -> 
+                try
+                    if(findRepeats list1 (Convert.ToInt32(textBoxCopy.Head))) then 
+                        uniqueElems (Convert.ToInt32(textBoxCopy.Head)::list1) textBoxCopy.Tail
+                    else 
+                        uniqueElems list1 textBoxCopy.Tail
+                with
+                    | :? Exception -> uniqueElems list1 textBoxCopy.Tail
+
+    let rec reverse list =
+        match list with
+        |[] -> []
+        |[x] -> [x]
+        | head::tail -> reverse tail @ [head]
+
+    let rec list1Output (list1:list<int>) = 
+        match list1 with
+        |[] -> ()
+        |_ -> textBox2.Text <- textBox2.Text + Convert.ToString(list1.Head) + "  "
+              list1Output list1.Tail
+
+    let (list0:list<int>) = uniqueElems [] textBoxCopy
+    let (list1:list<int>) = reverse list0
+    list1Output list1
+    list2Calc textBoxCopy list1
+
+let Press(e:EventArgs) =
+    textBox2.Text <- ""
+    textBox3.Text <- ""
+    let textBoxCopy = Seq.toList(textBox1.Text.Split ' ')
+    list1Calc textBoxCopy
+    ()
+
+button1.Click.Add(Press)
+
+[<STAThread>]
+[<EntryPoint>]
+let main argv =
+    do Application.Run(form)
+    0 
