@@ -99,31 +99,36 @@ let testForm (id:int)=
     EditorForm.Controls.Add(textBox2)
     EditorForm.Controls.Add(textBox1)
 
-    let connectionStr = "server=localhost;port=3306;username=root;password=;database=IZ16"
+    let connectionStrGlobal = "server=localhost;port=3306;username=root;password=;database=IZ16"
 
-    //let ExecuteSql (query:string) (connectionStr:string) = 
-    //    use rawSqlConnection = new MySqlConnection(connectionStr)
-    //    rawSqlConnection.Open() |> ignore
-    //    use command = new MySqlCommand(query, rawSqlConnection)
-    //    command.ExecuteNonQuery() |> ignore
-    //    ()
+    let ExecuteReader (commandStr:string) (connectionStr:string) = 
+        use connection = new MySqlConnection(connectionStr)
+        connection.Open()
+        use command = new MySqlCommand(commandStr,connection)
+        let reader = command.ExecuteReader()
+        if(reader.Read()) then
+            textBox1.Text <- reader.GetString(0)
+            textBox2.Text <- reader.GetString(1)
+            textBox3.Text <- reader.GetString(2)
+        ()
+
+    let ExecuteCommand (commandStr:string) (connectionStr:string) = 
+        use connection = new MySqlConnection(connectionStr)
+        connection.Open()
+        use command = new MySqlCommand(commandStr,connection)
+        command.ExecuteNonQuery() |> ignore
+        ()
+
     let toDB (weight:double) (speed:double)=
+        let on0:double =   weight/1000.0 * speed * speed / 2.0
         let on100:double = weight/1000.0 * (speed * 85.0 / 100.0) * (speed * 85.0 / 100.0) / 2.0
         let on200:double = weight/1000.0 * (speed * 70.0 / 100.0) * (speed * 70.0 / 100.0) / 2.0
         let on300:double = weight/1000.0 * (speed * 55.0 / 100.0) * (speed * 55.0 / 100.0) / 2.0
     
         if(id = -1) then
-            let commandStr = "INSERT INTO `IZ16`.`BulletCalc` (`id`,`BulletName`,`Weight`,`Speed`,`On100`,`On200`,`On300`) VALUES (NULL,'"+textBox1.Text+"','"+weight.ToString()+"','"+speed.ToString()+"','"+on100.ToString()+"','"+on200.ToString()+"','"+on300.ToString()+"')"
-            use connection = new MySqlConnection(connectionStr)
-            connection.Open() |> ignore
-            use command = new MySqlCommand(commandStr,connection)
-            command.ExecuteNonQuery() |>ignore
+            ExecuteCommand ("INSERT INTO `IZ16`.`BulletCalc` (`id`,`BulletName`,`Weight`,`Speed`,`On0`,`On100`,`On200`,`On300`) VALUES (NULL,'"+textBox1.Text+"','"+weight.ToString()+"','"+speed.ToString()+"','"+on0.ToString()+"','"+on100.ToString()+"','"+on200.ToString()+"','"+on300.ToString()+"')") connectionStrGlobal
         else
-            let commandStr = "UPDATE INTO `IZ16`.`BulletCalc` (`id`,`BulletName`,`Weight`,`Speed`,`On100`,`On200`,`On300`) VALUES ('"+textBox1.Text+"','"+weight.ToString()+"','"+speed.ToString()+"','"+on100.ToString()+"','"+on200.ToString()+"','"+on300.ToString()+"')"
-            use connection = new MySqlConnection(connectionStr)
-            connection.Open() |> ignore
-            use command = new MySqlCommand(commandStr,connection)
-            command.ExecuteNonQuery() |>ignore
+            ExecuteCommand ("UPDATE `IZ16`.`BulletCalc` SET `BulletName`='"+textBox1.Text+"',`Weight`='"+weight.ToString()+"', `Speed`='"+speed.ToString()+"',`On0`='"+on0.ToString()+"', `On100`='"+on100.ToString()+"', `On200`='"+on200.ToString()+"', `On300`='"+on300.ToString()+"' WHERE `id`='"+id.ToString()+"'") connectionStrGlobal
         ()
 
     let ContinueClick(e:EventArgs) =
@@ -133,16 +138,22 @@ let testForm (id:int)=
             let weight = Convert.ToDouble(textBox2.Text)
             let speed = Convert.ToDouble(textBox3.Text)
             toDB weight speed
+            EditorForm.Close()
             ()
         with
             | :? Exception ->  MessageBox.Show "Error with Fields consist" |> ignore
-        //finally
-
-    
+ 
     let CancelClick(e:EventArgs) = 
         EditorForm.Close()
         ()
-    Continue.Click.Add(ContinueClick)
+
+    let FormLoad(e:EventArgs) =
+        if(id <> -1) then
+            ExecuteReader ("SELECT `BulletName`,`Weight`,`Speed` FROM `IZ16`.`BulletCalc` WHERE `id`="+id.ToString()) connectionStrGlobal
+        ()
+
+    Continue.Click.Add(ContinueClick) 
     Cancel.Click.Add(CancelClick)
+    EditorForm.Load.Add(FormLoad)
     EditorForm.ShowDialog()
     ()
