@@ -4,57 +4,71 @@ open System.Drawing
 open System.Windows.Forms
 
 let form = new Form()
-let label1 = new System.Windows.Forms.Label();
-let textBox1 = new System.Windows.Forms.TextBox();
-let label2 = new System.Windows.Forms.Label();
-let textBox2 = new System.Windows.Forms.TextBox();
-// 
-// label1
-// 
-label1.AutoSize <- true;
-label1.Location <- new System.Drawing.Point(9, 9);
-label1.Name <- "label1";
-label1.Size <- new System.Drawing.Size(177, 16);
-label1.TabIndex <- 0;
-label1.Text <- "Введите исходный список";
+let label1 = new System.Windows.Forms.Label()
+let textBox1 = new System.Windows.Forms.TextBox()
+let label2 = new System.Windows.Forms.Label()
+let textBox2 = new System.Windows.Forms.TextBox()
+let button1 = new System.Windows.Forms.Button()
 // 
 // textBox1
 // 
-textBox1.Anchor <- (AnchorStyles.Top ||| AnchorStyles.Left ||| AnchorStyles.Right);
-textBox1.Location <- new System.Drawing.Point(12, 28);
-textBox1.Name <- "textBox1";
-textBox1.Size <- new System.Drawing.Size(363, 22);
-textBox1.TabIndex <- 1;
+textBox1.Anchor <- (System.Windows.Forms.AnchorStyles.Top ||| System.Windows.Forms.AnchorStyles.Left ||| System.Windows.Forms.AnchorStyles.Right)
+textBox1.Location <- new System.Drawing.Point(23, 44)
+textBox1.Name <- "textBox1"
+textBox1.Size <- new System.Drawing.Size(474, 20)
+textBox1.TabIndex <- 0
 // 
-// label2
+// button1
 // 
-label2.AutoSize <- true;
-label2.Location <- new System.Drawing.Point(9, 81);
-label2.Name <- "label2";
-label2.Size <- new System.Drawing.Size(123, 16);
-label2.TabIndex <- 2;
-label2.Text <- "Выходной Кортеж";
+button1.Anchor <- (System.Windows.Forms.AnchorStyles.Top ||| System.Windows.Forms.AnchorStyles.Left ||| System.Windows.Forms.AnchorStyles.Right)
+button1.Location <- new System.Drawing.Point(23, 87)
+button1.Name <- "button1"
+button1.Size <- new System.Drawing.Size(474, 69)
+button1.TabIndex <- 1
+button1.Text <- "Calculate"
+button1.UseVisualStyleBackColor <- true
 // 
 // textBox2
 // 
-textBox2.Anchor <- (System.Windows.Forms.AnchorStyles.Top ||| System.Windows.Forms.AnchorStyles.Left ||| System.Windows.Forms.AnchorStyles.Right);
-textBox2.Location <- new System.Drawing.Point(12, 97);
-textBox2.Name <- "textBox2";
-textBox2.Size <- new System.Drawing.Size(363, 22);
-textBox2.TabIndex <- 7;
+textBox2.Anchor <- (System.Windows.Forms.AnchorStyles.Top ||| System.Windows.Forms.AnchorStyles.Left ||| System.Windows.Forms.AnchorStyles.Right)
+textBox2.Location <- new System.Drawing.Point(23, 193)
+textBox2.Name <- "textBox2"
+textBox2.ReadOnly <- true
+textBox2.Size <- new System.Drawing.Size(474, 20)
+textBox2.TabIndex <- 2
+// 
+// label1
+// 
+label1.AutoSize <- true
+label1.Location <- new System.Drawing.Point(20, 25)
+label1.Name <- "label1"
+label1.Size <-new System.Drawing.Size(146, 13)
+label1.TabIndex <- 3
+label1.Text <- "Введите начальный список"
+// 
+// label2
+// 
+label2.AutoSize <- true
+label2.Location <- new System.Drawing.Point(20, 175)
+label2.Name <- "label2"
+label2.Size <- new System.Drawing.Size(59, 13)
+label2.TabIndex <- 4
+label2.Text <- "Результат"
 // 
 // Form1
 // 
-form.AutoScaleDimensions <- new System.Drawing.SizeF(8.0F, 16.0F);
-form.AutoScaleMode <- System.Windows.Forms.AutoScaleMode.Font;
-form.ClientSize <- new System.Drawing.Size(411, 171);
-form.Controls.Add(textBox2);
-form.Controls.Add(label2);
-form.Controls.Add(textBox1);
-form.Controls.Add(label1);
-form.Margin <- new System.Windows.Forms.Padding(4, 4, 4, 4);
-form.Name <- "Form1";
-form.Text <- "ИЗ13(№2)";
+form.AutoScaleDimensions <- new System.Drawing.SizeF(6.0F, 13.0F)
+form.AutoScaleMode <- System.Windows.Forms.AutoScaleMode.Font
+form.ClientSize <- new System.Drawing.Size(509, 248)
+
+form.Controls.Add(label2)
+form.Controls.Add(label1)
+form.Controls.Add(textBox2)
+form.Controls.Add(button1)
+form.Controls.Add(textBox1)
+
+form.Name = "Form1"
+form.Text = "ИЗ13"
 
 
 //- первый список содержит результат деления на два только четных элементов исходного
@@ -63,25 +77,61 @@ form.Text <- "ИЗ13(№2)";
 //- четвертый список содержит только те элементы третьего, которые встречаются в первом,
 //- пятый список содержит все элементы второго, третьего и четвертого списков. 
 
+let sqr x = x*x
+
+let rec reverse list =
+    match list with
+    |[] -> []
+    |[x] -> [x]
+    | head::tail -> reverse tail @ [head]
+
 let Change(e:EventArgs) = 
-   let rec add listEmpty textBoxCopy =
+   let rec listCalc (textBoxCopy:List<string>) (list1:List<int>) (list2:List<int>) (list3:List<int>) =
         match textBoxCopy with
-        | [] -> listEmpty
+        | [] -> ()
         | head::tail -> 
                         try
-                            Convert.ToInt32(head.ToString())
-                            textBox2.Text <- textBox2.Text + head.ToString()
-                            add (listEmpty@head) tail
+                            let temp = Convert.ToInt32(head.ToString())
+                            
+                            if(temp%2=0) then
+                                list1 = temp/2::list1 |> ignore
+
+                            if(temp%2%3=0) then
+                                list2 = temp/2/3::list2 |> ignore
+
+                            if(temp%2%3=0) then
+                                list3 = (sqr temp/2/3)::list3 |> ignore
+                            
+                            listCalc (textBoxCopy.Tail) (list1) (list2) (list3) 
                         with
-                            | :? Exception -> add (listEmpty) tail
-   let textBoxCopy = Seq.toList(textBox1.Text.Split ';')
-   let listEmpty = []
-   let result = add listEmpty textBoxCopy:List
+                            | :? Exception -> listCalc (textBoxCopy.Tail) list1 list2 list3
+        ()
+   let rec list4Calc (list1:List<int>) (list3:list<int>) (list4:list<int>) =
+          let rec Perebor (list1:List<int>) (elem:int) (list4:List<int>) = 
+                match list1 with
+                |[] -> ()
+                |head::tail -> if(list1.Head=elem) then 
+                                    list4 = elem::list4 |> ignore
+                               Perebor (list1.Tail) (elem) (list4:List<int>) 
+                ()
+          match list3 with
+          |[] -> ()
+          |head::tail -> Perebor (list1) (list3.Head) (list4)
+                         list4Calc (list1) (list3.Tail) (list4)
+          ()
+
+   let textBoxCopy = Seq.toList(textBox1.Text.Split ' ')
+   let list1 = []
+   let list2 = []
+   let list3 = []
+   let list4 = []
+   let list5 = []
+   let result = listCalc (textBoxCopy:List<string>)
+   list4Calc (list1) (list3) (list4) |> ignore
+   
    ()
 
-
-
-textBox1.TextChanged.Add(Change)
+button1.Click.Add(Change)
 
 [<STAThread>]
 [<EntryPoint>]
