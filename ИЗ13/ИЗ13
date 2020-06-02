@@ -79,56 +79,90 @@ form.Text = "ИЗ13"
 
 let sqr x = x*x
 
-let rec reverse list =
-    match list with
-    |[] -> []
-    |[x] -> [x]
-    | head::tail -> reverse tail @ [head]
+let rec Zip5 (list1:list<int>) (list2:list<int>) (list3:list<int>) (list4:list<int>) (list5:list<int>)=
+    let rec output list isFirst=
+        match list with
+        |[] -> textBox2.Text <- textBox2.Text + ")"
+        |head::tail ->  if(isFirst) then 
+                            textBox2.Text <- textBox2.Text + head.ToString()
+                            output tail false
+                        else
+                            textBox2.Text <- textBox2.Text + ", " + head.ToString()
+                            output tail false
+    textBox2.Text <- textBox2.Text + "["
+    textBox2.Text <- textBox2.Text + "( "
+    output list1 true
+    textBox2.Text <- textBox2.Text + "( "
+    output list2 true
+    textBox2.Text <- textBox2.Text + "( "
+    output list3 true
+    textBox2.Text <- textBox2.Text + "( "
+    output list4 true
+    textBox2.Text <- textBox2.Text + "( "
+    output list5 true
+    textBox2.Text <- textBox2.Text + "]"
 
 let Change(e:EventArgs) = 
-   let rec listCalc (textBoxCopy:List<string>) (list1:List<int>) (list2:List<int>) (list3:List<int>) =
+
+   let rec list1Calc (textBoxCopy:List<string>) (list1:List<int>) =
         match textBoxCopy with
-        | [] -> ()
+        | [] -> list1
         | head::tail -> 
                         try
-                            let temp = Convert.ToInt32(head.ToString())
-                            
-                            if(temp%2=0) then
-                                list1 = temp/2::list1 |> ignore
-
-                            if(temp%2%3=0) then
-                                list2 = temp/2/3::list2 |> ignore
-
-                            if(temp%2%3=0) then
-                                list3 = (sqr temp/2/3)::list3 |> ignore
-                            
-                            listCalc (textBoxCopy.Tail) (list1) (list2) (list3) 
+                            let temp = Convert.ToInt32(head.ToString())                            
+                            if(temp%2=0) then 
+                                list1Calc (textBoxCopy.Tail) (list1@[temp/2])
+                            else
+                                list1Calc (textBoxCopy.Tail) (list1)
                         with
-                            | :? Exception -> listCalc (textBoxCopy.Tail) list1 list2 list3
-        ()
+                            | :? Exception -> list1Calc (tail) list1
+
+   let rec list2Calc (textBoxCopy:List<string>) (list2:List<int>) =
+         match textBoxCopy with
+         | [] -> list2
+         | head::tail -> 
+                         try
+                             let temp = Convert.ToInt32(head.ToString())                             
+                             if(temp%2%3=0) then
+                                 list2 = list2@[temp/2/3] |> ignore
+                             list2Calc (textBoxCopy.Tail) (list2) 
+                         with
+                             | :? Exception -> list2Calc (tail) list2
+
+   let rec list3Calc (textBoxCopy:List<string>) (list3:List<int>) =
+         match textBoxCopy with
+         | [] -> list3
+         | head::tail -> 
+                         try
+                             let temp = Convert.ToInt32(head.ToString())                             
+                             if(temp%2%3=0) then
+                                 list3 = list3@[sqr(temp/2/3)] |> ignore
+                             list3Calc (textBoxCopy.Tail) (list3) 
+                         with
+                             | :? Exception -> list3Calc (tail) list3
+
    let rec list4Calc (list1:List<int>) (list3:list<int>) (list4:list<int>) =
-          let rec Perebor (list1:List<int>) (elem:int) (list4:List<int>) = 
+          let rec Perebor (list1:List<int>) (elem:int) = 
                 match list1 with
-                |[] -> ()
+                |[] -> false
                 |head::tail -> if(list1.Head=elem) then 
-                                    list4 = elem::list4 |> ignore
-                               Perebor (list1.Tail) (elem) (list4:List<int>) 
-                ()
+                                    true//list4 = list4@[elem] |> ignore
+                               else
+                                    Perebor (list1.Tail) (elem)
           match list3 with
-          |[] -> ()
-          |head::tail -> Perebor (list1) (list3.Head) (list4)
-                         list4Calc (list1) (list3.Tail) (list4)
-          ()
+          |[] -> list4
+          |head::tail -> if(Perebor (list1) (head)) then
+                            list4Calc (list1) (tail) (list4@[head]) //(list4)
+                         else
+                            list4Calc (list1) (tail) (list4)
 
    let textBoxCopy = Seq.toList(textBox1.Text.Split ' ')
-   let list1 = []
-   let list2 = []
-   let list3 = []
-   let list4 = []
+   let list1 = list1Calc textBoxCopy []
+   let list2 = list2Calc textBoxCopy []
+   let list3 = list3Calc textBoxCopy []
+   let list4 = list4Calc list1 list3 []
    let list5 = []
-   let result = listCalc (textBoxCopy:List<string>)
-   list4Calc (list1) (list3) (list4) |> ignore
-   
+   Zip5 list1 list2 list3 list4 list5 |>ignore
    ()
 
 button1.Click.Add(Change)
